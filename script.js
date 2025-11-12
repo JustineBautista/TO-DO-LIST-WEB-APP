@@ -1,186 +1,136 @@
-        let todos = [];
-            let currentFilter = 'all';
+// ==========================
+// 🟢 NAME PAGE (index.html)
+// ==========================
+if (document.getElementById('EnterBtn')) {
+  document.getElementById('EnterBtn').addEventListener('click', () => {
+    const name = document.getElementById('UserInput').value.trim();
 
-            // Load todos from localStorage
-            function loadTodos() {
-                const stored = localStorage.getItem('todos');
-                if (stored) {
-                    todos = JSON.parse(stored);
-                }
-                renderTodos();
-            }
-
-            // Save todos to localStorage
-            function saveTodos() {
-                localStorage.setItem('todos', JSON.stringify(todos));
-            }
-
-            // Add new todo
-            function addTodo() {
-                const input = document.getElementById('todoInput');
-                const text = input.value.trim();
-                
-                if (text) {
-                    todos.push({
-                        id: Date.now(),
-                        text: text,
-                        completed: false
-                    });
-                    input.value = '';
-                    saveTodos();
-                    renderTodos();
-                }
-            }
-
-            // Toggle todo completion
-            function toggleTodo(id) {
-                todos = todos.map(function(todo) {
-                    if (todo.id === id) {
-                        return { id: todo.id, text: todo.text, completed: !todo.completed };
-                    }
-                    return todo;
-                });
-                saveTodos();
-                renderTodos();
-            }
-
-            // Delete todo
-            function deleteTodo(id) {
-                todos = todos.filter(function(todo) {
-                    return todo.id !== id;
-                });
-                saveTodos();
-                renderTodos();
-            }
-
-            // Edit todo
-            function editTodo(id) {
-                var newText = prompt("Edit your task:", todos.find(function(t) { 
-                    return t.id === id; }).text);
-            
-                if (newText && newText.trim()) {
-                    todos = todos.map(function(todo) {
-                        if (todo.id === id) {
-                            return { id: todo.id, text: newText.trim(), completed: todo.completed };
-                }
-                return todo;
-            });
-                    saveTodos();
-                    renderTodos();
-                }
-            }
-
-            // Filter todos
-            function filterTodos() {
-                switch (currentFilter) {
-                    case 'active':
-                        return todos.filter(function(todo) { return !todo.completed; });
-                    case 'completed':
-                        return todos.filter(function(todo) { return todo.completed; });
-                    default:
-                        return todos;
-                }
-            }
-
-            // Render todos
-    function renderTodos() {
-        var todoList = document.getElementById('todoList');
-        var filtered = filterTodos();
-        
-        if (filtered.length === 0) {
-            todoList.innerHTML = '<div class="empty-state">No tasks to show</div>';
-        } else {
-            todoList.innerHTML = filtered.map(function(todo) {
-                if (todo.isEditing) {
-                    // Show edit mode
-                    return '<li class="todo-item editing">' +
-                        '<input type="text" class="edit-input" id="edit-' + todo.id + '" value="' + todo.text + '">' +
-                        '<button class="save-btn" onclick="saveEdit(' + todo.id + ')">Save</button>' +
-                        '<button class="cancel-btn" onclick="cancelEdit(' + todo.id + ')">Cancel</button>' +
-                    '</li>';
-                } else {
-                    // Show normal mode
-                    return '<li class="todo-item ' + (todo.completed ? 'completed' : '') + '">' +
-                        '<input type="checkbox" ' + (todo.completed ? 'checked' : '') + ' onchange="toggleTodo(' + todo.id + ')">' +
-                        '<span>' + todo.text + '</span>' +
-                        '<button class="edit-btn" ' + (todo.completed ? 'disabled' : '<button class="edit-btn" ' + (todo.completed ? 'disabled' : 'onclick="startEdit(' + todo.id + ')"') + '>Edit</button>') +
-                        '<button class="delete-btn" onclick="deleteTodo(' + todo.id + ')">Delete</button>' +
-                    '</li>';
-                }
-            }).join('');
-        }
-
-        var activeCount = todos.filter(function(t) { return !t.completed; }).length;
-        var completedCount = todos.filter(function(t) { return t.completed; }).length;
-        document.getElementById('stats').textContent = activeCount + ' active, ' + completedCount + ' completed';
+    if (name === "") {
+      alert("Please enter your name!");
+    } else {
+      sessionStorage.setItem("userName", name);
+      window.location.href = "dashboard.html";
     }
-            // Start editing
-    function startEdit(id) {
-        todos = todos.map(function(todo) {
-            if (todo.id === id) {
-                return { id: todo.id, text: todo.text, completed: todo.completed, isEditing: true };
-            }
-            return todo;
-        });
-        renderTodos();
-        // Focus the input
-        document.getElementById('edit-' + id).focus();
+  });
+}
+
+// ==========================
+// 🔵 DASHBOARD PAGE
+// ==========================
+if (document.getElementById('todoList')) {
+  const name = sessionStorage.getItem("userName");
+
+  if (!name) {
+    window.location.href = "index.html";
+  } else {
+    document.getElementById("title").textContent = `${name}'s Task List`;
+    document.getElementById("userGreeting").textContent = `👋 Hello, ${name}`;
+  }
+
+  // NAV toggle
+  const sidenav = document.getElementById('sidenav');
+  const toggleBtn = document.getElementById('menuToggle');
+  toggleBtn.addEventListener('click', () => {
+    sidenav.classList.toggle('open');
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem("userName");
+    window.location.href = "index.html";
+  });
+
+  // Clear all tasks
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (confirm("Clear all tasks?")) {
+      todos = [];
+      saveTodos();
+      renderTodos();
+    }
+  });
+
+  // To-do logic
+  let todos = [];
+  let currentFilter = 'all';
+
+  function loadTodos() {
+    const stored = localStorage.getItem('todos');
+    if (stored) todos = JSON.parse(stored);
+    renderTodos();
+  }
+
+  function saveTodos() {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+
+  function addTodo() {
+    const input = document.getElementById('todoInput');
+    const text = input.value.trim();
+
+    if (text) {
+      todos.push({ id: Date.now(), text, completed: false });
+      input.value = '';
+      saveTodos();
+      renderTodos();
+    }
+  }
+
+  window.toggleTodo = function (id) {
+    todos = todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    saveTodos();
+    renderTodos();
+  };
+
+  window.deleteTodo = function (id) {
+    todos = todos.filter(todo => todo.id !== id);
+    saveTodos();
+    renderTodos();
+  };
+
+  function filterTodos() {
+    if (currentFilter === 'active') return todos.filter(t => !t.completed);
+    if (currentFilter === 'completed') return todos.filter(t => t.completed);
+    return todos;
+  }
+
+  function renderTodos() {
+    const todoList = document.getElementById('todoList');
+    const filtered = filterTodos();
+
+    if (filtered.length === 0) {
+      todoList.innerHTML = '<div class="empty-state">No tasks to show</div>';
+    } else {
+      todoList.innerHTML = filtered.map(todo => `
+        <li class="todo-item ${todo.completed ? 'completed' : ''}">
+          <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})">
+          <span>${todo.text}</span>
+          <button onclick="deleteTodo(${todo.id})">Delete</button>
+        </li>
+      `).join('');
     }
 
-    // Save the edit
-    function saveEdit(id) {
-        var newText = document.getElementById('edit-' + id).value.trim();
-        
-        if (newText) {
-            todos = todos.map(function(todo) {
-                if (todo.id === id) {
-                    return { id: todo.id, text: newText, completed: todo.completed, isEditing: false };
-                }
-                return todo;
-            });
-            saveTodos();
-            renderTodos();
-        }
-    }
+    const activeCount = todos.filter(t => !t.completed).length;
+    const completedCount = todos.filter(t => t.completed).length;
+    document.getElementById('stats').textContent =
+      `${activeCount} active, ${completedCount} completed`;
+  }
 
-    // Cancel editing
-    function cancelEdit(id) {
-        todos = todos.map(function(todo) {
-            if (todo.id === id) {
-                return { id: todo.id, text: todo.text, completed: todo.completed, isEditing: false };
-            }
-            return todo;
-        });
-        renderTodos();
-    }
+  // Events
+  document.getElementById('addBtn').addEventListener('click', addTodo);
+  document.getElementById('todoInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') addTodo();
+  });
 
-                // Update stats
-                var activeCount = todos.filter(function(t) { return !t.completed; }).length;
-                var completedCount = todos.filter(function(t) { return t.completed; }).length;
-                document.getElementById('stats').textContent = 
-                    activeCount + ' active, ' + completedCount + ' completed';
-            
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderTodos();
+    });
+  });
 
-            
-
-            // Event listeners
-            document.getElementById('addBtn').addEventListener('click', addTodo);
-            document.getElementById('todoInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addTodo();
-            });
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.filter-btn').forEach(b => 
-                        b.classList.remove('active')
-                    );
-                    e.target.classList.add('active');
-                    currentFilter = e.target.dataset.filter;
-                    renderTodos();
-                });
-            });
-        
-            // Initialize
-            loadTodos();
-
-            
+  loadTodos();
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | To-Do App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 🔹 Top Navigation Bar -->
+  <nav class="navbar">
+    <span class="logo">📝 To-Do App</span>
+    <button id="menuToggle" aria-label="Toggle Menu">☰</button>
+  </nav>
+
+  <!-- 🔹 Side Navigation -->
+  <aside class="sidenav" id="sidenav">
+    <h2 id="userGreeting">Welcome, <span id="username">User</span> 👋</h2>
+    <ul>
+      <li><button class="filter-btn active" data-filter="all">All Tasks</button></li>
+      <li><button class="filter-btn" data-filter="active">Active</button></li>
+      <li><button class="filter-btn" data-filter="completed">Completed</button></li>
+      <li><button id="clearBtn" class="danger-btn">🗑️ Clear All</button></li>
+      <li><button id="logoutBtn" class="logout-btn">🚪 Logout</button></li>
+    </ul>
+  </aside>
+
+  <!-- 🔹 Main To-Do Content -->
+  <main class="main-content">
+    <div class="todo-container">
+      <h1 id="title">Your Tasks</h1>
+
+      <div class="input-container">
+        <input 
+          type="text" 
+          id="todoInput" 
+          placeholder="Add a new task..." 
+          aria-label="Add a new task"
+        />
+        <button id="addBtn">Add Task</button>
+      </div>
+
+      <ul id="todoList"></ul>
+
+      <div class="stats">
+        <span id="stats">0 tasks</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
