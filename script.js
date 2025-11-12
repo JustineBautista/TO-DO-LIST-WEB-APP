@@ -1,136 +1,153 @@
-// ==========================
-// 🟢 NAME PAGE (index.html)
-// ==========================
-if (document.getElementById('EnterBtn')) {
-  document.getElementById('EnterBtn').addEventListener('click', () => {
-    const name = document.getElementById('UserInput').value.trim();
+/* ===== ELEMENTS ===== */
+const userInput = document.getElementById('UserInput');
+const enterBtn = document.getElementById('EnterBtn');
 
-    if (name === "") {
-      alert("Please enter your name!");
-    } else {
-      sessionStorage.setItem("userName", name);
-      window.location.href = "dashboard.html";
-    }
-  });
+const usernameSpan = document.getElementById('username');
+const todoInput = document.getElementById('todoInput');
+const addBtn = document.getElementById('addBtn');
+const todoList = document.getElementById('todoList');
+const stats = document.getElementById('stats');
+
+const filterBtns = document.querySelectorAll('.filter-btn');
+const clearBtn = document.getElementById('clearBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
+const sidenav = document.getElementById('sidenav');
+const menuToggle = document.getElementById('menuToggle');
+
+let currentUser = '';
+let tasks = [];
+
+/* ===== SIDEBAR TOGGLE ===== */
+if (menuToggle && sidenav) {
+    menuToggle.addEventListener('click', () => {
+        sidenav.classList.toggle('open');
+    });
 }
 
-// ==========================
-// 🔵 DASHBOARD PAGE
-// ==========================
-if (document.getElementById('todoList')) {
-  const name = sessionStorage.getItem("userName");
+/* ===== LOGIN / WELCOME PAGE ===== */
+if (enterBtn) {
+    enterBtn.addEventListener('click', () => {
+        const name = userInput.value.trim();
+        if (!name) return alert('Please enter your name');
+        
+        currentUser = name;
+        localStorage.setItem('currentUser', currentUser);
 
-  if (!name) {
-    window.location.href = "index.html";
-  } else {
-    document.getElementById("title").textContent = `${name}'s Task List`;
-    document.getElementById("userGreeting").textContent = `👋 Hello, ${name}`;
-  }
+        // Initialize empty tasks for new user
+        if (!localStorage.getItem(`tasks_${currentUser}`)) {
+            localStorage.setItem(`tasks_${currentUser}`, JSON.stringify([]));
+        }
 
-  // NAV toggle
-  const sidenav = document.getElementById('sidenav');
-  const toggleBtn = document.getElementById('menuToggle');
-  toggleBtn.addEventListener('click', () => {
-    sidenav.classList.toggle('open');
-  });
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+    });
+}
 
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    sessionStorage.removeItem("userName");
-    window.location.href = "index.html";
-  });
-
-  // Clear all tasks
-  document.getElementById('clearBtn').addEventListener('click', () => {
-    if (confirm("Clear all tasks?")) {
-      todos = [];
-      saveTodos();
-      renderTodos();
+/* ===== LOAD USER ON DASHBOARD ===== */
+document.addEventListener('DOMContentLoaded', () => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser && usernameSpan) {
+        currentUser = storedUser;
+        usernameSpan.textContent = currentUser;
+        tasks = JSON.parse(localStorage.getItem(`tasks_${currentUser}`)) || [];
+        renderTasks();
     }
-  });
+});
 
-  // To-do logic
-  let todos = [];
-  let currentFilter = 'all';
+/* ===== RENDER TASKS ===== */
+function renderTasks(filter = 'all') {
+    if (!todoList) return;
 
-  function loadTodos() {
-    const stored = localStorage.getItem('todos');
-    if (stored) todos = JSON.parse(stored);
-    renderTodos();
-  }
+    todoList.innerHTML = '';
 
-  function saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }
-
-  function addTodo() {
-    const input = document.getElementById('todoInput');
-    const text = input.value.trim();
-
-    if (text) {
-      todos.push({ id: Date.now(), text, completed: false });
-      input.value = '';
-      saveTodos();
-      renderTodos();
-    }
-  }
-
-  window.toggleTodo = function (id) {
-    todos = todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    saveTodos();
-    renderTodos();
-  };
-
-  window.deleteTodo = function (id) {
-    todos = todos.filter(todo => todo.id !== id);
-    saveTodos();
-    renderTodos();
-  };
-
-  function filterTodos() {
-    if (currentFilter === 'active') return todos.filter(t => !t.completed);
-    if (currentFilter === 'completed') return todos.filter(t => t.completed);
-    return todos;
-  }
-
-  function renderTodos() {
-    const todoList = document.getElementById('todoList');
-    const filtered = filterTodos();
+    const filtered = tasks.filter(task => {
+        if (filter === 'all') return true;
+        if (filter === 'active') return !task.completed;
+        if (filter === 'completed') return task.completed;
+    });
 
     if (filtered.length === 0) {
-      todoList.innerHTML = '<div class="empty-state">No tasks to show</div>';
-    } else {
-      todoList.innerHTML = filtered.map(todo => `
-        <li class="todo-item ${todo.completed ? 'completed' : ''}">
-          <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})">
-          <span>${todo.text}</span>
-          <button onclick="deleteTodo(${todo.id})">Delete</button>
-        </li>
-      `).join('');
+        todoList.innerHTML = `<li class="empty-state">No tasks here</li>`;
     }
 
-    const activeCount = todos.filter(t => !t.completed).length;
-    const completedCount = todos.filter(t => t.completed).length;
-    document.getElementById('stats').textContent =
-      `${activeCount} active, ${completedCount} completed`;
-  }
+    filtered.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = 'todo-item' + (task.completed ? ' completed' : '');
+        li.innerHTML = `
+            <span>${task.text}</span>
+            <div>
+                <button class="complete-btn">${task.completed ? '✔️' : '✅'}</button>
+                <button class="delete-btn">🗑️</button>
+            </div>
+        `;
 
-  // Events
-  document.getElementById('addBtn').addEventListener('click', addTodo);
-  document.getElementById('todoInput').addEventListener('keypress', e => {
-    if (e.key === 'Enter') addTodo();
-  });
+        // Toggle complete
+        li.querySelector('.complete-btn').addEventListener('click', () => {
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks();
+            renderTasks(filter);
+        });
 
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      currentFilter = e.target.dataset.filter;
-      renderTodos();
+        // Delete task
+        li.querySelector('.delete-btn').addEventListener('click', () => {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks(filter);
+        });
+
+        todoList.appendChild(li);
     });
-  });
 
-  loadTodos();
+    if (stats) {
+        stats.textContent = `${tasks.length} tasks`;
+    }
+}
+
+/* ===== SAVE TASKS ===== */
+function saveTasks() {
+    if (!currentUser) return;
+    localStorage.setItem(`tasks_${currentUser}`, JSON.stringify(tasks));
+}
+
+/* ===== ADD TASK ===== */
+if (addBtn && todoInput) {
+    addBtn.addEventListener('click', () => {
+        const text = todoInput.value.trim();
+        if (!text) return;
+        tasks.push({ text, completed: false });
+        todoInput.value = '';
+        saveTasks();
+        renderTasks();
+    });
+}
+
+/* ===== FILTER BUTTONS ===== */
+if (filterBtns.length) {
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderTasks(btn.dataset.filter);
+        });
+    });
+}
+
+/* ===== CLEAR ALL ===== */
+if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all tasks?')) {
+            tasks = [];
+            saveTasks();
+            renderTasks();
+        }
+    });
+}
+
+/* ===== LOGOUT ===== */
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+    });
 }

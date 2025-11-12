@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard | To-Do App</title>
+  <title>To-Do Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- 🔹 Top Navigation Bar -->
+  <!-- Top Navigation Bar -->
   <nav class="navbar">
     <span class="logo">📝 To-Do App</span>
-    <button id="menuToggle" aria-label="Toggle Menu">☰</button>
+    <button id="menuToggle">☰</button>
   </nav>
 
-  <!-- 🔹 Side Navigation -->
+  <!-- Side Navigation -->
   <aside class="sidenav" id="sidenav">
-    <h2 id="userGreeting">Welcome, <span id="username">User</span> 👋</h2>
+    <h2 id="userGreeting">Welcome, <span id="username"></span></h2>
     <ul>
       <li><button class="filter-btn active" data-filter="all">All Tasks</button></li>
       <li><button class="filter-btn" data-filter="active">Active</button></li>
@@ -25,19 +25,14 @@
     </ul>
   </aside>
 
-  <!-- 🔹 Main To-Do Content -->
+  <!-- Main To-Do Content -->
   <main class="main-content">
     <div class="todo-container">
-      <h1 id="title">Your Tasks</h1>
+      <h1 id="title">Task List</h1>
 
       <div class="input-container">
-        <input 
-          type="text" 
-          id="todoInput" 
-          placeholder="Add a new task..." 
-          aria-label="Add a new task"
-        />
-        <button id="addBtn">Add Task</button>
+        <input type="text" id="todoInput" placeholder="Add a new task..." />
+        <button id="addBtn">Add</button>
       </div>
 
       <ul id="todoList"></ul>
