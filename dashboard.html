@@ -1,46 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>To-Do Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TaskFlow — Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Top Navigation Bar -->
   <nav class="navbar">
-    <span class="logo">📝 To-Do App</span>
-    <button id="menuToggle">☰</button>
+    <div class="logo">📋 <span class="logo-text">TaskFlow</span></div>
+    <div class="nav-actions">
+      <button id="menuToggle" aria-label="Toggle menu">☰</button>
+      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme">🌙</button>
+    </div>
   </nav>
 
-  <!-- Side Navigation -->
-  <aside class="sidenav" id="sidenav">
-    <h2 id="userGreeting">Welcome, <span id="username"></span></h2>
-    <ul>
-      <li><button class="filter-btn active" data-filter="all">All Tasks</button></li>
-      <li><button class="filter-btn" data-filter="active">Active</button></li>
-      <li><button class="filter-btn" data-filter="completed">Completed</button></li>
-      <li><button id="clearBtn" class="danger-btn">🗑️ Clear All</button></li>
-      <li><button id="logoutBtn" class="logout-btn">🚪 Logout</button></li>
-    </ul>
-  </aside>
+  <aside id="sidenav" class="sidenav open">
+    <h2>Welcome, <span id="username">User</span></h2>
 
-  <!-- Main To-Do Content -->
-  <main class="main-content">
-    <div class="todo-container">
-      <h1 id="title">Task List</h1>
-
-      <div class="input-container">
-        <input type="text" id="todoInput" placeholder="Add a new task..." />
-        <button id="addBtn">Add</button>
-      </div>
-
-      <ul id="todoList"></ul>
-
-      <div class="stats">
-        <span id="stats">0 tasks</span>
+    <div class="section">
+      <label for="categorySelect">Category</label>
+      <select id="categorySelect"></select>
+      <div class="category-controls">
+        <input id="newCategoryInput" placeholder="New category name" />
+        <button id="addCategoryBtn">Add</button>
       </div>
     </div>
+
+    <ul class="sidebar-filters">
+      <li><button class="filter-btn active" data-filter="all">All</button></li>
+      <li><button class="filter-btn" data-filter="active">Active</button></li>
+      <li><button class="filter-btn" data-filter="completed">Completed</button></li>
+    </ul>
+
+    <div class="sidenav-bottom">
+      <button id="clearBtn" class="danger-btn">Clear all tasks</button>
+      <button id="logoutBtn" class="logout-btn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <section class="todo-container">
+      <header class="todo-header">
+        <h1>Your tasks</h1>
+        <div class="controls-inline">
+          <label for="sortSelect">Sort</label>
+          <select id="sortSelect">
+            <option value="custom">Custom</option>
+            <option value="priority">Priority</option>
+            <option value="dueDate">Due date</option>
+            <option value="recent">Most recent</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="input-row">
+        <input id="todoInput" placeholder="Add a task..." />
+        <select id="prioritySelect" title="Priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+        <input id="dueDateInput" type="datetime-local" title="Due date (optional)" />
+        <input id="reminderInput" type="number" min="0" placeholder="Remind (min before)" title="Minutes before due time" />
+        <button id="addBtn" class="primary">Add</button>
+      </div>
+
+      <ul id="todoList" class="todo-list"></ul>
+
+      <div id="stats" class="stats"></div>
+    </section>
   </main>
 
   <script src="script.js"></script>

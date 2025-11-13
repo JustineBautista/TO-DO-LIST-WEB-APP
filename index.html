@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Welcome - TaskFlow</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="welcome-page">
   <div class="name-container">
-    <h1>Welcome To</h1>
-    <h2>To-Do List App</h2>
-    
-    <div class="input-container">
-      <input type="text" id="UserInput" placeholder="Enter Your Name" /><br />
-      <button id="EnterBtn">Enter</button>
+    <div class="logo-icon">📋</div>
+    <h1>Welcome to TaskFlow</h1>
+    <h2>Quickly get organized — enter your name</h2>
+
+    <div class="input-container-welcome">
+      <input id="UserInput" type="text" placeholder="Your name..." />
+      <button id="EnterBtn">Continue</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const userInput = document.getElementById('UserInput');
+    const enterBtn = document.getElementById('EnterBtn');
+
+    enterBtn.addEventListener('click', () => {
+      const name = userInput.value.trim();
+      if (!name) return alert('Please enter your name');
+      localStorage.setItem('currentUser', name);
+
+      if (!localStorage.getItem(`tasks_${name}`)) localStorage.setItem(`tasks_${name}`, JSON.stringify([]));
+      if (!localStorage.getItem(`categories_${name}`)) localStorage.setItem(`categories_${name}`, JSON.stringify(['General']));
+      window.location.href = 'dashboard.html';
+    });
+
+    userInput.addEventListener('keypress', e => { if (e.key === 'Enter') enterBtn.click(); });
+  </script>
 </body>
 </html>
